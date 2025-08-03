@@ -14,6 +14,7 @@ export async function handleDocumentUpload(req: Request, res: Response): Promise
   try {
     const file = req.file;
     const user = req.user;
+    const description = req.body.description;
 
     if (!file) {
       res.status(400).json({ error: 'No file uploaded' });
@@ -42,7 +43,7 @@ export async function handleDocumentUpload(req: Request, res: Response): Promise
     }
     // 1. Save metadata to PostgreSQL
     //@ts-ignore
-    const result = await insertDocument(docId, file.originalname, user.id);
+    const result = await insertDocument(docId, file.originalname, user.id, description);
     if (!result) {
       res.status(500).json({ error: 'Failed to save document metadata' });
       return;
@@ -94,3 +95,5 @@ export async function deleteDocument(req: Request, res: Response): Promise<void>
     res.status(500).json({ error: 'Delete failed' });
   }
 }
+
+

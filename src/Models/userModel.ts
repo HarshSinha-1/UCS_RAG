@@ -116,10 +116,10 @@ export async function checkAuthType(email: string) {
   return result.rows[0];
 }
 
-export async function insertDocument(doc_id: string, title: string, uploaded_by: number) {
+export async function insertDocument(doc_id: string, title: string, uploaded_by: number, description: string) {
   const result = await pool.query(
-    'INSERT INTO documents (doc_id, title, uploaded_by) VALUES ($1, $2, $3) RETURNING *',
-    [doc_id, title, uploaded_by]
+    'INSERT INTO documents (doc_id, title, uploaded_by, description) VALUES ($1, $2, $3, $4) RETURNING *',
+    [doc_id, title, uploaded_by, description]
   );
   return result.rows[0];
 }
