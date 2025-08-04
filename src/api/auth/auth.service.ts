@@ -197,8 +197,9 @@ export const verifyGoogleProfileAndLogin = async (profile: any) => {
   try {
     const PROVIDER = 'google';
     const PROVIDER_ID = profile.id;
-    const email = profile.emails?.[0]?.value || 'No Email';
+    const email = profile._json?.email || profile.emails?.[0]?.value;
     const name = profile.displayName || profile.username || 'Unknown';
+    console.log("Google Profile Email:", email);
 
     if (email === 'No Email') throw new Error('No email found in Google profile');
 
@@ -231,6 +232,7 @@ export const verifyGoogleProfileAndLogin = async (profile: any) => {
       if(isTokenExpired(expiresAt)) {
         // Token is expired, delete the session
         const deletesession =  await deleteExpiredUserSessions(user.id);
+        console.log("Deleted existing sessions ",deletesession.rows)
         const token = await JWT.sign({ id: user.id, email }, config.JWT_SECRET!, { expiresIn: '1h' });
         const session = await createUserSession(user.id, token);
         if (!session) throw new Error("Failed to create new session");
@@ -270,8 +272,9 @@ export const verifyGoogleProfileAndLogin = async (profile: any) => {
 
 export const handleGoogleCallback = async (req: Request, res: Response) => {
   const loginData = req.user as any;
+  console.log('Google Login Data:', loginData);
   if (!loginData?.success) {
-    return res.status(400).json({ error: loginData?.error || 'Login failed' });
+    return res.status(400).json({ error: loginData?.error  });
   }
 
   // You can set a cookie or redirect as needed
