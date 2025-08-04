@@ -12,7 +12,7 @@ interface Config {
 }
 
 const config: Config = {
-  port: Number(process.env.PORT) ,
+  port: Number(process.env.PORT || 3000) ,
   Db_connection: String(process.env.Db_connection),
   api_resend: String(process.env.api_resend),
   JWT_SECRET: String(process.env.JWT_SECRET),
