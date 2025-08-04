@@ -441,7 +441,9 @@ export const handleGitHubCallback = async (req: Request, res: Response) => {
 
   res.locals.isAuthenticated = true; // Set authenticated flag
 
-  return res.redirect('/auth/dashboard');
+  res.setHeader('Authorization', `Bearer ${loginData.jwtToken}`);
+  const redirectURL = `http://localhost:5173/oauth-success?token=${loginData.jwtToken}`;
+  return res.redirect(redirectURL);
 };
 
 

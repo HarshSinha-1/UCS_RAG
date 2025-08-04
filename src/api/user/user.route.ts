@@ -5,7 +5,7 @@ import { getdocuments } from './user.services';
 
 const UserRouter = express.Router();
 //@ts-ignore
-UserRouter.get('/query', [UserAuthenticate], handleUserQuery);
+UserRouter.post('/query', [UserAuthenticate], handleUserQuery);
 //@ts-ignore
 UserRouter.get('/documents', getdocuments);
 

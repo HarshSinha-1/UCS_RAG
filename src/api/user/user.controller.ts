@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 
 export async function handleUserQuery(req: Request, res: Response) {
   try {
+
     const { query, doc_id } = req.body;
 
     if (!query || !doc_id || !Array.isArray(doc_id)) {

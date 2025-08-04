@@ -86,7 +86,7 @@ authRoutes.get('/github', (req, res) => {
 
 authRoutes.get(
   '/github/callback',
-  passport.authenticate('custom-github', { failureRedirect: '/login', session: false }),
+  passport.authenticate('custom-github', { failureRedirect: '/signin', session: false }),
   githubCallback
 );
 
@@ -111,7 +111,7 @@ authRoutes.get('/dashboard', (req, res) => {
   if (req.isAuthenticated()) {
     res.send('<h1>Welcome to the Dashboard!</h1>'); // Render your dashboard content
   } else {
-    res.redirect('/login');  // Redirect to login if not authenticated
+    res.redirect('/signin');  // Redirect to login if not authenticated
   }
 });
 
