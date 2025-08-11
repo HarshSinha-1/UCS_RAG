@@ -137,3 +137,11 @@ export async function fetchDocumentsFromDB() {
   const result = await pool.query('SELECT doc_id, title, uploaded_at, description FROM documents');
   return result.rows;
 }
+
+export async function getUserDetailbyID(userId: number) {
+  const result = await pool.query(
+    'SELECT id, username, email, created_at, auth_type FROM users WHERE id = $1',
+    [userId]
+  );
+  return result.rows[0];
+}

@@ -197,8 +197,9 @@ export const verifyGoogleProfileAndLogin = async (profile: any) => {
   try {
     const PROVIDER = 'google';
     const PROVIDER_ID = profile.id;
-    const email = profile.emails?.[0]?.value || 'No Email';
+    const email = profile._json?.email || profile.emails?.[0]?.value;
     const name = profile.displayName || profile.username || 'Unknown';
+    console.log("Google Profile Email:", email);
 
     if (email === 'No Email') throw new Error('No email found in Google profile');
 
@@ -208,9 +209,12 @@ export const verifyGoogleProfileAndLogin = async (profile: any) => {
     if (userResult && userResult.rows?.[0]) {
       const user = userResult.rows[0];
 
-      if (user.auth_type === 'Credentials') {
-        throw new Error('Please sign in using Credentials, you cannot use OAuth.');
-      }
+     
+        if (user.auth_type === 'Credentials') {
+          throw new Error('Please sign in using credentials. OAuth login is not allowed for this account.');
+        }
+        
+      
 
       const AuthmethodRes = await FindOauthUser(PROVIDER_ID, PROVIDER);
 
@@ -231,6 +235,7 @@ export const verifyGoogleProfileAndLogin = async (profile: any) => {
       if(isTokenExpired(expiresAt)) {
         // Token is expired, delete the session
         const deletesession =  await deleteExpiredUserSessions(user.id);
+        console.log("Deleted existing sessions ",deletesession.rows)
         const token = await JWT.sign({ id: user.id, email }, config.JWT_SECRET!, { expiresIn: '1h' });
         const session = await createUserSession(user.id, token);
         if (!session) throw new Error("Failed to create new session");
@@ -270,8 +275,9 @@ export const verifyGoogleProfileAndLogin = async (profile: any) => {
 
 export const handleGoogleCallback = async (req: Request, res: Response) => {
   const loginData = req.user as any;
+  console.log('Google Login Data:', loginData);
   if (!loginData?.success) {
-    return res.status(400).json({ error: loginData?.error || 'Login failed' });
+    return res.status(400).json({ error: loginData?.error  });
   }
 
   // You can set a cookie or redirect as needed
@@ -281,12 +287,14 @@ export const handleGoogleCallback = async (req: Request, res: Response) => {
   res.cookie('token', loginData.jwtToken, {
     httpOnly: true,
     secure: false,
-    sameSite: 'lax', 
+    sameSite: 'lax',
   });
 
-  res.locals.isAuthenticated = true; 
+  res.locals.isAuthenticated = true; // Set authenticated flag
 
-  return res.redirect('/auth/dashboard');
+  res.setHeader('Authorization', `Bearer ${loginData.jwtToken}`);
+  const redirectURL = `http://localhost:5173/oauth-success?token=${loginData.jwtToken}`;
+  return res.redirect(redirectURL);
 };
 
 
@@ -352,7 +360,7 @@ export const verifyGitHubProfileAndLogin = async (profile: any) => {
       const user = userResult.rows[0];
 
       if (user.auth_type === 'Credentials') {
-        throw new Error('Please sign in using Credentials, you cannot use OAuth.');
+        return { success: false, error: 'Please sign in using Credentials, you cannot use OAuth.' };
       }
 
       const AuthmethodRes = await FindOauthUser(PROVIDER_ID, PROVIDER);

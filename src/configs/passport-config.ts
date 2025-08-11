@@ -79,8 +79,14 @@ passport.use('google', new CustomStrategy(
        return done(new Error(googleLoginResponse.error), null);
    }
 
-console.log('[Google] Sending userId to serialize:', googleLoginResponse.userId); // 👀 Add this
-return done(null, googleLoginResponse.userId);
+  //console.log('[Google] Sending userId to serialize:', googleLoginResponse.userId); // 👀 Add this
+  return done(null, {
+   id: googleLoginResponse.userId,
+   jwtToken: googleLoginResponse.jwtToken,
+   email: googleLoginResponse.email,
+   success: true,
+   message: googleLoginResponse.message,
+});
 
     } catch (err: any) {
       console.error('[Google] Custom OAuth Error:', err.message);
@@ -147,13 +153,13 @@ passport.use('custom-github', new CustomStrategy(
       const email = emailsArray.find((e: any) => e.primary)?.email;
 
  // Assert the type of profileRes.data
- const githubData = profileRes.data as {
-   id: number;
-   login: string;
-   name: string;
-   avatar_url: string;
-   [key: string]: any;
- };
+      const githubData = profileRes.data as {
+       id: number;
+       login: string;
+       name: string;
+       avatar_url: string;
+       [key: string]: any;
+   };
 
  const profile = {
    id: githubData.id,
